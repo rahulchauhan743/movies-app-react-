@@ -1,8 +1,15 @@
 import React from "react";
+
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
+
 import Filter from "./Filter"
 import Navbar from "./Navbar";
 import Search from "./Search.jsx";
 import Table from "./Table";
+import Login from "./Login";
+import Customer from "./Customer";
+import Rentals from "./Rentals";
 
 class App extends React.Component {
   state = {
@@ -71,39 +78,59 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <Navbar />
-        
-        <div className="row">
+     <Router>
+        <div>
+          <Navbar /> 
+
+          <Switch>
+            <Route exact path="/rentals">
+              <Rentals />
+            </Route>
+
+            <Route exact path="/customer">
+              <Customer />
+            </Route>
+
+            <Route exact path="/login">
+              <Login />
+            </Route>
+             
+            <Route exact path="/">
+                
+               <div className="row">
            
-            <Filter
-                 handleFilter = {this.setFilter}
-                 selectedFilter = {this.state.selectedFilter}
-                 genreData = {this.state.genre} 
-            />
-  
-             <div class="col-9 p-4"> 
-                 <Search 
-                   search={this.state.search}
-                   updateSearch={this.updateSearch}
-                   total={this.state.movies.length}
-                 />
+                  <Filter
+                        handleFilter = {this.setFilter}
+                        selectedFilter = {this.state.selectedFilter}
+                        genreData = {this.state.genre} 
+                  />
+ 
+               <div class="col-9 p-4"> 
+                  <Search 
+                    search={this.state.search}
+                    updateSearch={this.updateSearch}
+                    total={this.state.movies.length}
+                  />
 
-                 <Table 
-                     search={this.state.search}
-                     deleteMovie={this.deleteMovie}
-                     toggleLike = {this.toggleLike}
-                     selectedFilter = {this.state.selectedFilter}
-                     moviesData ={this.state.movies}  
-                 />                
+                  <Table 
+                      search={this.state.search}
+                      deleteMovie={this.deleteMovie}
+                      toggleLike = {this.toggleLike}
+                      selectedFilter = {this.state.selectedFilter}
+                      moviesData ={this.state.movies}  
+                  />                
 
-             </div>
+               </div>
+           </div>
+
+            </Route>
 
 
-
+          </Switch>
         </div>
-        
-      </div>
+     </Router>
+
+     
     );
   }
 }
