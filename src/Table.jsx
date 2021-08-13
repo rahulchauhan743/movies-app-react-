@@ -1,24 +1,54 @@
+import React from "react"
 import Pagination from "./Pagination";
+import "./Table.css";
 
-let Table = (props) => {
-   let allMovies = props.moviesData;
-   let currFilter = props.selectedFilter;
-   
-   let filteredMoviesArr = allMovies.filter((el) => {
-        
-         if(currFilter === "All Genre"){
-             return el;
-         }
+
+class Table extends React.Component{
+   state = {
+     currPage : 1,
+   }
+ 
+
+   selectPage = (value) => {
+    this.setState({ currPage: value });
+   };
+
+
+   render(){
+    let allMovies = this.props.moviesData;
+    let currFilter = this.props.selectedFilter;
+    
+    let filteredMoviesArr = allMovies.filter((el) => {
          
-         else if(el.genre.name === currFilter){
-             return el; 
-         }
+          if(currFilter === "All Genre"){
+              return el;
+          }
+          
+          else if(el.genre.name === currFilter){
+              return el; 
+          }
+ 
+    })
 
-   })
+    filteredMoviesArr=filteredMoviesArr.filter((el)=>{
+         let movieTitle = el.title;
+         movieTitle=movieTitle.toLowerCase();
+         let s = this.props.search.toLowerCase();
+         return movieTitle.includes(s);
+    })
 
-   return (
+    let numberOfPages = Math.ceil(filteredMoviesArr.length / 4);
+
+    let startIndex = (this.state.currPage - 1) * 4;
+    let endIndex = Math.min(filteredMoviesArr.length, this.state.currPage * 4);
+
+
+     let arrToBeUsedInTable = filteredMoviesArr.slice(startIndex, endIndex);
+
+
+     return (
      <>
-     <div class="row">
+          <div class="row">
                   
                   <div class="col-10">
                       <table class="table mt-4">
@@ -34,18 +64,42 @@ let Table = (props) => {
                           </thead>
                           <tbody>
                             {
-                                filteredMoviesArr.map((el) => {
+                              arrToBeUsedInTable.map((el) => {
                                      return(
-                                        <tr>
+                                        <tr key = {el._id}>
                                             
                                             <td>{el.title}</td>
                                             <td>{el.genre.name}</td>
                                             <td>{el.numberInStock}</td>
                                             <td>{el.dailyRentalRate}</td>
-                                            <td>like</td>
-                                            <td>
-                                                <button>Delete</button>
+                                            <td
+                                               onClick = { () => {
+                                                     this.props.toggleLike(el._id);   
+                                               }}
+                                            >
+                                            {
+                                              el.liked ? (
+                                                <span class="material-icons-outlined">
+                                                   favorite
+                                                </span>
+                                              ):
+                                              (
+                                                <span class="material-icons-outlined">
+                                                   favorite_border
+                                                </span>
+                                              )
+                                            }
                                             </td>
+
+                                            <td>
+                                                  <button 
+                                                  onClick = { () => {
+                                                      this.props.deleteMovie(el._id);
+                                                  }}
+                                                  className="table-delete-btn"
+                                                  >
+                                                  Delete</button>
+                                           </td>
 
                                         </tr>
                                      );   
@@ -60,14 +114,19 @@ let Table = (props) => {
   
   
                </div>
-     
+    
+         <Pagination
+          selectPage = {this.selectPage}
+          currPage = {this.state.currPage}
+          numberOfPages = {numberOfPages}
+         />
 
 
-
-
-         <Pagination/>
      </>
-   )
+     )
+   }
+
 }
+
 
 export default Table;
